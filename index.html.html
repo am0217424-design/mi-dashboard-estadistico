@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudio Estadístico de Opinión Pública</title>
+    <!-- Tailwind CSS y Chart.js vía CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #090d16; color: #f3f4f6; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .bg-dark-card { background-color: #111827; border: 1px solid #1f2937; }
+        .hero-bg {
+            background: linear-gradient(rgba(9, 13, 22, 0.90), rgba(9, 13, 22, 0.98)), 
+                        url('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80') no-repeat center center;
+            background-size: cover;
+        }
+        .nav-btn { transition: all 0.3s ease; }
+        .nav-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3); }
+        .avatar-btn { transition: all 0.2s ease; }
+        .avatar-btn:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- ================================================================= -->
+    <!-- NIVEL 1: PANTALLA PRINCIPAL (MENÚ DE TEMAS)                      -->
+    <!-- ================================================================= -->
+    <div id="screen-home" class="hero-bg flex-1 flex flex-col justify-center items-center px-4 py-16 text-center">
+        <div class="max-w-5xl mx-auto w-full">
+            <div class="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 px-4 py-1.5 rounded-full text-xs font-mono mb-6 border border-blue-500/20">
+                <i class="fa-solid fa-database"></i> Base de Datos: Ejercicio_#2_2.xlsx
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-4">
+                Informe Analítico Interactivo de <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Resultados del Estudio de Opinión</span>
+            </h1>
+            <p class="text-gray-400 text-sm md:text-base max-w-3xl mx-auto mb-12">
+                Estructura de frecuencias obtenidas a partir de la muestra del estudio. Selecciona cualquiera de las áreas de estudio inferiores para auditar sus tópicos analíticos.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                <button onclick="openTopicsMenu('laboral')" class="nav-btn bg-dark-card p-6 rounded-xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-blue-500 group text-center">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-briefcase text-xl"></i>
+                    </div>
+                    <span class="text-xs font-bold tracking-wider text-gray-300 group-hover:text-white uppercase">Aspiraciones Laborales</span>
+                </button>
+
+                <button onclick="openTopicsMenu('celular')" class="nav-btn bg-dark-card p-6 rounded-xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-blue-500 group text-center">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-mobile-screen-button text-xl"></i>
+                    </div>
+                    <span class="text-xs font-bold tracking-wider text-gray-300 group-hover:text-white uppercase">Uso del Celular</span>
+                </button>
+
+                <button onclick="openTopicsMenu('mundial')" class="nav-btn bg-dark-card p-6 rounded-xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-blue-500 group text-center">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-soccer-ball text-xl"></i>
+                    </div>
+                    <span class="text-xs font-bold tracking-wider text-gray-300 group-hover:text-white uppercase">Percepción Mundial 2026</span>
+                </button>
+
+                <button onclick="openTopicsMenu('catorceavo')" class="nav-btn bg-dark-card p-6 rounded-xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-blue-500 group text-center">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-money-bill-trend-up text-xl"></i>
+                    </div>
+                    <span class="text-xs font-bold tracking-wider text-gray-300 group-hover:text-white uppercase">Destino Financiero</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- NIVEL 2: SUBMENÚ DE TÓPICOS                                       -->
+    <!-- ================================================================= -->
+    <div id="screen-topics-menu" class="hero-bg hidden flex-1 flex flex-col justify-center items-center px-4 py-16 text-center">
+        <div class="max-w-5xl mx-auto w-full">
+            <div class="flex justify-start mb-6">
+                <button onclick="goToHome()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-lg text-xs font-medium cursor-pointer">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>Volver a Temas
+                </button>
+            </div>
+            
+            <div class="inline-flex items-center gap-2 bg-indigo-500/10 text-indigo-400 px-4 py-1.5 rounded-full text-xs font-mono mb-4 border border-indigo-500/20">
+                <i class="fa-solid fa-layer-group"></i> Matriz de Tópicos
+            </div>
+            
+            <h1 id="topics-menu-title" class="text-2xl md:text-4xl font-black text-white tracking-tight mb-4"></h1>
+            <p class="text-gray-400 text-xs md:text-sm max-w-2xl mx-auto mb-12">
+                Selecciona uno de los 4 tópicos específicos para desplegar su respectiva información demográfica asociativa y sus gráficos correspondientes.
+            </p>
+
+            <div id="grid-topics-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full"></div>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- NIVEL 3: DETALLE REESTRUCTURADO                                   -->
+    <!-- ================================================================= -->
+    <div id="screen-detail" class="hidden flex-1 container mx-auto px-4 py-8">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-5 mb-6">
+            <button id="btn-back-to-topics" class="bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-lg text-xs font-medium cursor-pointer">
+                <i class="fa-solid fa-arrow-left mr-2"></i>Volver a Tópicos
+            </button>
+            <h2 id="detail-section-title" class="text-xs font-bold text-gray-400 tracking-wider uppercase"></h2>
+        </div>
+
+        <!-- FILA PRINCIPAL SUPERIOR: ENCUESTA (IZQ) Y GRÁFICOS/GÉNERO (DER) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start max-w-7xl mx-auto">
+            
+            <!-- COLUMNA IZQUIERDA (5/12): TABLA DE FRECUENCIAS DE LA PREGUNTA -->
+            <div class="lg:col-span-5 bg-dark-card rounded-xl p-5 border border-gray-800 shadow-xl flex flex-col justify-between h-full">
+                <div>
+                    <span id="detail-topic-badge" class="text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20"></span>
+                    <h3 id="detail-question" class="text-sm md:text-base font-bold text-white mt-3 mb-4"></h3>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-700 text-[10px] font-bold uppercase text-gray-400 bg-gray-900/40">
+                                <th class="px-3 py-2">Variable</th>
+                                <th class="px-3 py-2 text-right">Frecuencia (N)</th>
+                                <th class="px-3 py-2 text-right">Porcentaje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA (7/12): GRÁFICO ESTADÍSTICO + FILTRO DE GÉNERO A LA PAR -->
+            <div class="lg:col-span-7 bg-dark-card rounded-xl p-5 border border-gray-800 shadow-xl grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                
+                <!-- Subcolumna Gráfico (8/12 de la tarjeta) -->
+                <div class="md:col-span-8 w-full h-64 p-2 bg-gray-900/20 rounded-xl border border-gray-800/60">
+                    <canvas id="detail-chart-canvas"></canvas>
+                </div>
+
+                <!-- Subcolumna Géneros (4/12 de la tarjeta) - CON ICONOS AGREGADOS -->
+                <div class="md:col-span-4 flex flex-col items-center justify-center gap-4 border-l border-gray-800/80 pl-2">
+                    <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase text-center">Filtro por Género</span>
+                    
+                    <!-- Icono Mujeres (¡Actualizado con icono de verificación interno!) -->
+                    <button onclick="filterByGender('female')" class="avatar-btn flex items-center gap-3 bg-gray-900/50 hover:bg-gray-800 border border-gray-800 p-2 rounded-lg w-full cursor-pointer relative group" id="box-gender-female">
+                        <div class="w-10 h-10 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400" id="circle-female">
+                            <i class="fa-solid fa-user-dress text-xl"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="block text-xs font-bold text-gray-200">Mujeres</span>
+                                <i id="check-female" class="fa-solid fa-circle-check text-pink-400 text-xs hidden"></i>
+                            </div>
+                            <span class="block text-[10px] font-mono text-gray-400" id="label-female-count">0</span>
+                        </div>
+                    </button>
+
+                    <!-- Icono Hombres -->
+                    <button onclick="filterByGender('male')" class="avatar-btn flex items-center gap-3 bg-gray-900/50 hover:bg-gray-800 border border-gray-800 p-2 rounded-lg w-full cursor-pointer relative group" id="box-gender-male">
+                        <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400" id="circle-male">
+                            <i class="fa-solid fa-user text-xl"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="block text-xs font-bold text-gray-200">Hombres</span>
+                                <i id="check-male" class="fa-solid fa-circle-check text-blue-400 text-xs hidden"></i>
+                            </div>
+                            <span class="block text-[10px] font-mono text-gray-400" id="label-male-count">0</span>
+                        </div>
+                    </button>
+
+                    <!-- Botón Reset Ambos -->
+                    <button onclick="filterByGender('both')" class="text-[10px] font-medium text-blue-400 hover:underline cursor-pointer" id="btn-reset-both">
+                        <i class="fa-solid fa-arrows-spin mr-1"></i> Mostrar Ambos Juntos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA INFERIOR SEPARADA: TABLA DE RANGOS DE EDADES DE ESTE TÓPICO (DINÁMICA) -->
+        <div class="max-w-7xl mx-auto mt-6 bg-dark-card rounded-xl p-5 border border-gray-800 shadow-xl">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-4">
+                <div class="flex items-center gap-2 text-indigo-400">
+                    <i class="fa-solid fa-cake-candles text-xs"></i>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-300">Auditoría Demográfica: Distribución por Rangos de Edades</h4>
+                </div>
+                <span id="age-table-filter-indicator" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold"></span>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-700 text-[9px] font-bold uppercase text-gray-400 bg-gray-900/20">
+                            <th class="px-4 py-2">Rango Cronológico</th>
+                            <th class="px-4 py-2 text-center">Muestra Representativa (%)</th>
+                            <th class="px-4 py-2 text-right">Estatus de Segmento</th>
+                        </tr>
+                    </thead>
+                    <tbody id="age-table-body">
+                        <!-- Creado dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-950 border-t border-gray-800 text-center py-4 text-xs text-gray-500 mt-auto font-mono">
+        Análisis Estadístico Formal &copy; 2026. Todos los derechos reservados.
+    </footer>
+
+    <script>
+        // Base de datos que ahora incluye la sub-segmentación de EDADES específicas por género
+        const dataScript = {
+            "laboral": {
+                "title": "Aspiraciones Laborales", "icon": "fa-briefcase",
+                "topics": [
+                    {
+                        "topico": "Preferencia de Modalidad de Trabajo", "pregunta": "¿Qué tipo de modalidad laboral prefiere para su futuro profesional?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "40.5%", "26-35 años": "35.0%", "36-45 años": "18.5%", "46+ años": "6.0%"},
+                            "female": {"18-25 años": "45.0%", "26-35 años": "33.2%", "36-45 años": "16.8%", "46+ años": "5.0%"},
+                            "male": {"18-25 años": "33.5%", "26-35 años": "37.8%", "36-45 años": "21.2%", "46+ años": "7.5%"}
+                        },
+                        "both": {"labels": ["Remoto Total", "Híbrido", "Presencial", "Emprendimiento propio"], "values": [340, 420, 114, 130]},
+                        "female": {"labels": ["Remoto Total", "Híbrido", "Presencial", "Emprendimiento propio"], "values": [210, 240, 64, 90]},
+                        "male": {"labels": ["Remoto Total", "Híbrido", "Presencial", "Emprendimiento propio"], "values": [130, 180, 50, 40]}
+                    },
+                    {
+                        "topico": "Prioridad en Beneficios Corporativos", "pregunta": "Seleccione el factor determinante para aceptar una propuesta laboral:",
+                        "age_datasets": {
+                            "both": {"18-25 años": "22.0%", "26-35 años": "41.2%", "36-45 años": "28.3%", "46+ años": "8.5%"},
+                            "female": {"18-25 años": "20.5%", "26-35 años": "44.0%", "36-45 años": "27.5%", "46+ años": "8.0%"},
+                            "male": {"18-25 años": "24.3%", "26-35 años": "37.0%", "36-45 años": "29.5%", "46+ años": "9.2%"}
+                        },
+                        "both": {"labels": ["Salario competitivo", "Crecimiento profesional", "Seguro médico", "Flexibilidad horaria"], "values": [480, 260, 114, 150]},
+                        "female": {"labels": ["Salario competitivo", "Crecimiento profesional", "Seguro médico", "Flexibilidad horaria"], "values": [280, 160, 64, 100]},
+                        "male": {"labels": ["Salario competitivo", "Crecimiento profesional", "Seguro médico", "Flexibilidad horaria"], "values": [200, 100, 50, 50]}
+                    },
+                    {
+                        "topico": "Área de Interés de Emprendimiento", "pregunta": "Si decidiera emprender, ¿en qué sector lo haría?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "33.1%", "26-35 años": "34.9%", "36-45 años": "24.0%", "46+ años": "8.0%"},
+                            "female": {"18-25 años": "35.2%", "26-35 años": "36.8%", "36-45 años": "21.0%", "46+ años": "7.0%"},
+                            "male": {"18-25 años": "30.0%", "26-35 años": "32.0%", "36-45 años": "28.5%", "46+ años": "9.5%"}
+                        },
+                        "both": {"labels": ["Tecnología / Servicios", "Comercio / Tiendas", "Gastronomía", "Consultoría / Legal"], "values": [290, 360, 214, 140]},
+                        "female": {"labels": ["Tecnología / Servicios", "Comercio / Tiendas", "Gastronomía", "Consultoría / Legal"], "values": [150, 240, 144, 70]},
+                        "male": {"labels": ["Tecnología / Servicios", "Comercio / Tiendas", "Gastronomía", "Consultoría / Legal"], "values": [140, 120, 70, 70]}
+                    },
+                    {
+                        "topico": "Capacitación Profesional Continua", "pregunta": "¿Qué área considera urgente para fortalecer sus competencias?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "38.0%", "26-35 años": "32.0%", "36-45 años": "22.0%", "46+ años": "8.0%"},
+                            "female": {"18-25 años": "40.2%", "26-35 años": "31.8%", "36-45 años": "20.0%", "46+ años": "8.0%"},
+                            "male": {"18-25 años": "34.7%", "26-35 años": "32.3%", "36-45 años": "25.0%", "46+ años": "8.0%"}
+                        },
+                        "both": {"labels": ["Idiomas", "Habilidades Técnicas / Data", "Liderazgo y Gestión", "Finanzas Personales"], "values": [310, 390, 184, 120]},
+                        "female": {"labels": ["Idiomas", "Habilidades Técnicas / Data", "Liderazgo y Gestión", "Finanzas Personales"], "values": [190, 220, 114, 80]},
+                        "male": {"labels": ["Idiomas", "Habilidades Técnicas / Data", "Liderazgo y Gestión", "Finanzas Personales"], "values": [120, 170, 70, 40]}
+                    }
+                ]
+            },
+            "celular": {
+                "title": "Uso del Celular", "icon": "fa-mobile-screen-button",
+                "topics": [
+                    {
+                        "topico": "Tiempo de Exposición Diario", "pregunta": "¿Cuánto tiempo cree que pasa usando su celular al día?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "45.2%", "26-35 años": "32.1%", "36-45 años": "18.5%", "46+ años": "4.2%"},
+                            "female": {"18-25 años": "48.5%", "26-35 años": "31.0%", "36-45 años": "16.5%", "46+ años": "4.0%"},
+                            "male": {"18-25 años": "40.2%", "26-35 años": "33.8%", "36-45 años": "21.5%", "46+ años": "4.5%"}
+                        },
+                        "both": {"labels": ["Más de 6 horas", "Entre 4 y 6 horas", "Entre 2 y 4 horas", "Menos de 2 horas"], "values": [264, 348, 304, 88]},
+                        "female": {"labels": ["Más de 6 horas", "Entre 4 y 6 horas", "Entre 2 y 4 horas", "Menos de 2 horas"], "values": [170, 208, 176, 50]},
+                        "male": {"labels": ["Más de 6 horas", "Entre 4 y 6 horas", "Entre 2 y 4 horas", "Menos de 2 horas"], "values": [94, 140, 128, 38]}
+                    },
+                    {
+                        "topico": "Reacción ante el Olvido", "pregunta": "Si olvidara su celular al salir de casa, ¿qué haría?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "20.1%", "26-35 años": "36.4%", "36-45 años": "31.0%", "46+ años": "12.5%"},
+                            "female": {"18-25 años": "19.5%", "26-35 años": "38.0%", "36-45 años": "30.5%", "46+ años": "11.5%"},
+                            "male": {"18-25 años": "21.0%", "26-35 años": "34.0%", "36-45 años": "31.8%", "46+ años": "13.2%"}
+                        },
+                        "both": {"labels": ["Depende la distancia", "Regresa inmediatamente", "Continúa sin él", "No responde"], "values": [508, 256, 188, 52]},
+                        "female": {"labels": ["Depende la distancia", "Regresa inmediatamente", "Continúa sin él", "No responde"], "values": [300, 160, 112, 32]},
+                        "male": {"labels": ["Depende la distancia", "Regresa inmediatamente", "Continúa sin él", "No responde"], "values": [208, 96, 76, 20]}
+                    },
+                    {
+                        "topico": "Frecuencia de Revisión Inconsciente", "pregunta": "¿Con qué frecuencia revisa su celular sin que este haya sonado?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "38.5%", "26-35 años": "34.0%", "36-45 años": "22.0%", "46+ años": "5.5%"},
+                            "female": {"18-25 años": "41.0%", "26-35 años": "33.5%", "36-45 años": "20.5%", "46+ años": "5.0%"},
+                            "male": {"18-25 años": "34.7%", "26-35 años": "34.8%", "36-45 años": "24.3%", "46+ años": "6.2%"}
+                        },
+                        "both": {"labels": ["Constantemente", "Varias veces al día", "Algunas veces al día", "Casi nunca"], "values": [264, 420, 260, 60]},
+                        "female": {"labels": ["Constantemente", "Varias veces al día", "Algunas veces al día", "Casi nunca"], "values": [168, 248, 154, 34]},
+                        "male": {"labels": ["Constantemente", "Varias veces al día", "Algunas veces al día", "Casi nunca"], "values": [96, 172, 106, 26]}
+                    },
+                    {
+                        "topico": "Autopercepción de Dependencia", "pregunta": "¿Usted se considera una persona dependiente del celular?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "40.0%", "26-35 años": "35.2%", "36-45 años": "19.8%", "46+ años": "5.0%"},
+                            "female": {"18-25 años": "42.5%", "26-35 años": "34.0%", "36-45 años": "19.0%", "46+ años": "4.5%"},
+                            "male": {"18-25 años": "36.2%", "26-35 años": "37.0%", "36-45 años": "21.0%", "46+ años": "5.8%"}
+                        },
+                        "both": {"labels": ["Sí", "Tal vez", "No", "No lo sé"], "values": [248, 428, 272, 56]},
+                        "female": {"labels": ["Sí", "Tal vez", "No", "No lo sé"], "values": [158, 250, 162, 34]},
+                        "male": {"labels": ["Sí", "Tal vez", "No", "No lo sé"], "values": [90, 178, 110, 22]}
+                    }
+                ]
+            },
+            "mundial": {
+                "title": "Percepción Mundial 2026", "icon": "fa-soccer-ball",
+                "topics": [
+                    {
+                        "topico": "Expectativa Emocional del Evento", "pregunta": "Cuando comienza un Mundial, ¿usted qué siente?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "31.2%", "26-35 años": "38.0%", "36-45 años": "24.3%", "46+ años": "6.5%"},
+                            "female": {"18-25 años": "28.0%", "26-35 años": "39.5%", "36-45 años": "25.5%", "46+ años": "7.0%"},
+                            "male": {"18-25 años": "36.0%", "26-35 años": "35.7%", "36-45 años": "22.5%", "46+ años": "5.8%"}
+                        },
+                        "both": {"labels": ["Emoción y entusiasmo", "Interés moderado", "Es un evento más", "Indiferencia"], "values": [328, 324, 232, 120]},
+                        "female": {"labels": ["Emoción y entusiasmo", "Interés moderado", "Es un evento más", "Indiferencia"], "values": [154, 202, 160, 88]},
+                        "male": {"labels": ["Emoción y entusiasmo", "Interés moderado", "Es un evento más", "Indiferencia"], "values": [174, 122, 72, 32]}
+                    },
+                    {
+                        "topico": "Comportamiento del Espectador", "pregunta": "¿Qué es más probable que haga durante un partido del mundial?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "28.4%", "26-35 años": "36.1%", "36-45 años": "27.0%", "46+ años": "8.5%"},
+                            "female": {"18-25 años": "26.8%", "26-35 años": "37.2%", "36-45 años": "27.0%", "46+ años": "9.0%"},
+                            "male": {"18-25 años": "30.8%", "26-35 años": "34.5%", "36-45 años": "27.0%", "46+ años": "7.7%"}
+                        },
+                        "both": {"labels": ["Verlo si tengo tiempo", "Seguirlo por redes", "Reuniones sociales", "Ignorarlo"], "values": [484, 208, 168, 144]},
+                        "female": {"labels": ["Verlo si tengo tiempo", "Seguirlo por redes", "Reuniones sociales", "Ignorarlo"], "values": [310, 114, 82, 98]},
+                        "male": {"labels": ["Verlo si tengo tiempo", "Seguirlo por redes", "Reuniones sociales", "Ignorarlo"], "values": [174, 94, 86, 46]}
+                    },
+                    {
+                        "topico": "Opinión de Sede Compartida", "pregunta": "¿Qué opina de que el Mundial 2026 se juegue en tres países?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "29.0%", "26-35 años": "34.5%", "36-45 años": "28.0%", "46+ años": "8.5%"},
+                            "female": {"18-25 años": "28.5%", "26-35 años": "35.0%", "36-45 años": "27.5%", "46+ años": "9.0%"},
+                            "male": {"18-25 años": "29.8%", "26-35 años": "33.7%", "36-45 años": "28.8%", "46+ años": "7.7%"}
+                        },
+                        "both": {"labels": ["Buena idea", "Prefiero una sola sede", "Le quita la esencia", "Indiferente"], "values": [400, 304, 124, 176]},
+                        "female": {"labels": ["Buena idea", "Prefiero una sola sede", "Le quita la esencia", "Indiferente"], "values": [232, 180, 80, 112]},
+                        "male": {"labels": ["Buena idea", "Prefiero una sola sede", "Le quita la esencia", "Indiferente"], "values": [168, 124, 44, 64]}
+                    },
+                    {
+                        "topico": "Predicción de Campeón", "pregunta": "Distribución de respuestas espontáneas sobre favoritos",
+                        "age_datasets": {
+                            "both": {"18-25 años": "35.0%", "26-35 años": "32.0%", "36-45 años": "25.0%", "46+ años": "8.0%"},
+                            "female": {"18-25 años": "36.5%", "26-35 años": "31.5%", "36-45 años": "24.0%", "46+ años": "8.0%"},
+                            "male": {"18-25 años": "32.8%", "26-35 años": "32.8%", "36-45 años": "26.4%", "46+ años": "8.0%"}
+                        },
+                        "both": {"labels": ["Argentina", "Brasil", "Portugal", "Francia / España / Otros"], "values": [196, 124, 144, 540]},
+                        "female": {"labels": ["Argentina", "Brasil", "Portugal", "Francia / España / Otros"], "values": [112, 68, 82, 342]},
+                        "male": {"labels": ["Argentina", "Brasil", "Portugal", "Francia / España / Otros"], "values": [84, 56, 62, 198]}
+                    }
+                ]
+            },
+            "catorceavo": {
+                "title": "Destino Financiero", "icon": "fa-money-bill-trend-up",
+                "topics": [
+                    {
+                        "topico": "Prioridad Financiera Inmediata", "pregunta": "Cuando piensa en su catorceavo, ¿qué es lo primero que se le viene a la mente?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "18.2%", "26-35 años": "42.3%", "36-45 años": "31.5%", "46+ años": "8.0%"},
+                            "female": {"18-25 años": "16.5%", "26-35 años": "44.0%", "36-45 años": "31.5%", "46+ años": "6.5%"},
+                            "male": {"18-25 años": "20.8%", "26-35 años": "39.7%", "36-45 años": "31.5%", "46+ años": "10.0%"}
+                        },
+                        "both": {"labels": ["Pagar deudas", "Ahorrar", "Comprar necesidades", "Gastos familiares"], "values": [512, 192, 120, 180]},
+                        "female": {"labels": ["Pagar deudas", "Ahorrar", "Comprar necesidades", "Gastos familiares"], "values": [318, 112, 74, 100]},
+                        "male": {"labels": ["Pagar deudas", "Ahorrar", "Comprar necesidades", "Gastos familiares"], "values": [194, 80, 46, 80]}
+                    },
+                    {
+                        "topico": "Destino Principal del Fondo", "pregunta": "¿Qué destino tendrá principalmente su catorceavo mes?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "19.0%", "26-35 años": "40.5%", "36-45 años": "32.0%", "46+ años": "8.5%"},
+                            "female": {"18-25 años": "17.8%", "26-35 años": "42.2%", "36-45 años": "32.0%", "46+ años": "8.0%"},
+                            "male": {"18-25 años": "20.8%", "26-35 años": "38.0%", "36-45 años": "32.0%", "46+ años": "9.2%"}
+                        },
+                        "both": {"labels": ["Pago de compromisos", "Gastos del hogar", "Ahorro", "Compras / Viajes"], "values": [476, 236, 148, 144]},
+                        "female": {"labels": ["Pago de compromisos", "Gastos del hogar", "Ahorro", "Compras / Viajes"], "values": [290, 146, 86, 82]},
+                        "male": {"labels": ["Pago de compromisos", "Gastos del hogar", "Ahorro", "Compras / Viajes"], "values": [186, 90, 62, 62]}
+                    },
+                    {
+                        "topico": "Psicología del Beneficio", "pregunta": "¿Qué siente cuando recibe el catorceavo mes?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "26.5%", "26-35 años": "35.0%", "36-45 años": "28.5%", "46+ años": "10.0%"},
+                            "female": {"18-25 años": "25.0%", "26-35 años": "36.8%", "36-45 años": "28.7%", "46+ años": "9.5%"},
+                            "male": {"18-25 años": "28.8%", "26-35 años": "32.3%", "36-45 años": "28.2%", "46+ años": "10.7%"}
+                        },
+                        "both": {"labels": ["Alegría", "Alivio financiero", "Tranquilidad", "Preocupación por escasez"], "values": [316, 292, 208, 188]},
+                        "female": {"labels": ["Alegría", "Alivio financiero", "Tranquilidad", "Preocupación por escasez"], "values": [192, 174, 122, 116]},
+                        "male": {"labels": ["Alegría", "Alivio financiero", "Tranquilidad", "Preocupación por escasez"], "values": [124, 118, 86, 72]}
+                    },
+                    {
+                        "topico": "Velocidad de Disipación", "pregunta": "¿Qué tan rápido cree que gastará la mayor parte de este dinero?",
+                        "age_datasets": {
+                            "both": {"18-25 años": "24.1%", "26-35 años": "38.2%", "36-45 años": "28.2%", "46+ años": "9.5%"},
+                            "female": {"18-25 años": "23.0%", "26-35 años": "39.5%", "36-45 años": "28.5%", "46+ años": "9.0%"},
+                            "male": {"18-25 años": "25.8%", "26-35 años": "36.2%", "36-45 años": "27.8%", "46+ años": "10.2%"}
+                        },
+                        "both": {"labels": ["Menos de una semana", "En el primer mes", "Varios meses", "Conservará una parte"], "values": [304, 276, 160, 264]},
+                        "female": {"labels": ["Menos de una semana", "En el primer mes", "Varios meses", "Conservará una parte"], "values": [184, 168, 92, 160]},
+                        "male": {"labels": ["Menos de una semana", "En el primer mes", "Varios meses", "Conservará una parte"], "values": [120, 108, 68, 104]}
+                    }
+                ]
+            }
+        };
+
+        let currentActiveTheme = "";
+        let currentActiveTopicIdx = null;
+        let currentChartInstance = null;
+
+        function hideAllScreens() {
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-topics-menu').classList.add('hidden');
+            document.getElementById('screen-detail').classList.add('hidden');
+        }
+
+        function goToHome() {
+            hideAllScreens();
+            document.getElementById('screen-home').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openTopicsMenu(themeKey) {
+            currentActiveTheme = themeKey;
+            const themeData = dataScript[themeKey];
+            hideAllScreens();
+            
+            document.getElementById('topics-menu-title').innerHTML = `Tópicos de: <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">${themeData.title}</span>`;
+            
+            const gridContainer = document.getElementById('grid-topics-container');
+            gridContainer.innerHTML = ""; 
+
+            themeData.topics.forEach((t, idx) => {
+                gridContainer.innerHTML += `
+                    <button onclick="openDetailView(${idx})" class="nav-btn bg-dark-card p-6 rounded-xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-blue-500 group text-center">
+                        <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                            <i class="fa-solid ${themeData.icon} text-lg"></i>
+                        </div>
+                        <span class="text-[11px] font-bold tracking-wide text-gray-300 group-hover:text-white uppercase line-clamp-2">
+                            ${t.topico}
+                        </span>
+                    </button>
+                `;
+            });
+
+            document.getElementById('screen-topics-menu').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openDetailView(topicIdx) {
+            currentActiveTopicIdx = topicIdx;
+            const themeData = dataScript[currentActiveTheme];
+            const topicData = themeData.topics[topicIdx];
+
+            hideAllScreens();
+
+            document.getElementById('btn-back-to-topics').setAttribute("onclick", `openTopicsMenu('${currentActiveTheme}')`);
+            document.getElementById('detail-section-title').innerHTML = `<i class="fa-solid ${themeData.icon} text-blue-400 mr-2"></i>Eje: ${themeData.title}`;
+            
+            document.getElementById('detail-topic-badge').innerText = `Tópico: ${topicData.topico}`;
+            document.getElementById('detail-question').innerText = topicData.pregunta;
+
+            document.getElementById('label-female-count').innerText = `${topicData.female.values.reduce((a,b)=>a+b, 0)} respuestas`;
+            document.getElementById('label-male-count').innerText = `${topicData.male.values.reduce((a,b)=>a+b, 0)} respuestas`;
+
+            // Ejecutar filtro inicial consolidado
+            filterByGender('both');
+
+            document.getElementById('screen-detail').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // LÓGICA DE FILTRADO INTEGRAL (AFECTA ENCUESTA, GRÁFICO Y EDADES SIMULTÁNEAMENTE)
+        function filterByGender(genderKey) {
+            const topicData = dataScript[currentActiveTheme].topics[currentActiveTopicIdx];
+            let selectedDataset = topicData[genderKey];
+            let selectedAgeDataset = topicData.age_datasets[genderKey];
+
+            // 1. Gestionar estados visuales de los botones e iconos de control
+            if(genderKey === 'female') {
+                document.getElementById('box-gender-female').className = "avatar-btn flex items-center gap-3 border p-2 rounded-lg w-full cursor-pointer bg-pink-500/10 border-pink-500 shadow-md";
+                document.getElementById('circle-female').className = "w-10 h-10 rounded-full flex items-center justify-center bg-pink-500/30 text-pink-300";
+                document.getElementById('check-female').classList.remove('hidden');
+                
+                document.getElementById('box-gender-male').className = "avatar-btn flex items-center gap-3 border p-2 rounded-lg w-full cursor-pointer bg-gray-900/50 border-gray-800 opacity-50";
+                document.getElementById('circle-male').className = "w-10 h-10 rounded-full flex items-center justify-center bg-blue-500/10 text-blue-400";
+                document.getElementById('check-male').classList.add('hidden');
+                
+                document.getElementById('btn-reset-both').className = "text-[10px] font-medium text-blue-400 hover:underline cursor-pointer";
+                
+                document.getElementById('age-table-filter-indicator').innerText = "Filtro: Solo Mujeres";
+                document.getElementById('age-table-filter-indicator').className = "text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-pink-500/10 text-pink-400 border border-pink-500/20";
+            } 
+            else if(genderKey === 'male') {
+                document.getElementById('box-gender-female').className = "avatar-btn flex items-center gap-3 border p-2 rounded-lg w-full cursor-pointer bg-gray-900/50 border-gray-800 opacity-50";
+                document.getElementById('circle-female').className = "w-10 h-10 rounded-full flex items-center justify-center bg-pink-500/10 text-pink-400";
+                document.getElementById('check-female').classList.add('hidden');
+                
+                document.getElementById('box-gender-male').className = "avatar-btn flex items-center gap-3 border p-2 rounded-lg w-full cursor-pointer bg-blue-500/10 border-blue-500 shadow-md";
+                document.getElementById('circle-male').className = "w-10 h-10 rounded-full flex items-center justify-center bg-blue-500/30 text-blue-300";
+                document.getElementById('check-male').classList.remove('hidden');
+                
+                document.getElementById('btn-reset-both').className = "text-[10px] font-medium text-blue-400 hover:underline cursor-pointer";
+                
+                document.getElementById('age-table-filter-indicator').innerText = "Filtro: Solo Hombres";
+                document.getElementById('age-table-filter-indicator').className = "text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20";
+            } 
+            else { // Muestra consolidada (Both)
+                document.getElementById('box-gender-female').className = "avatar-btn flex items-center gap-3 bg-gray-900/50 border border-gray-800 p-2 rounded-lg w-full cursor-pointer";
+                document.getElementById('circle-female').className = "w-10 h-10 rounded-full flex items-center justify-center bg-pink-500/10 text-pink-400";
+                document.getElementById('check-female').classList.add('hidden');
+                
+                document.getElementById('box-gender-male').className = "avatar-btn flex items-center gap-3 bg-gray-900/50 border border-gray-800 p-2 rounded-lg w-full cursor-pointer";
+                document.getElementById('circle-male').className = "w-10 h-10 rounded-full flex items-center justify-center bg-blue-500/10 text-blue-400";
+                document.getElementById('check-male').classList.add('hidden');
+                
+                document.getElementById('btn-reset-both').className = "text-[10px] font-medium text-gray-500 cursor-default no-underline";
+                
+                document.getElementById('age-table-filter-indicator').innerText = "Muestra Completa (Ambos)";
+                document.getElementById('age-table-filter-indicator').className = "text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20";
+            }
+
+            // 2. Actualizar Tabla de Frecuencias de Variables (Izquierda)
+            const tbody = document.getElementById('detail-table-body');
+            tbody.innerHTML = "";
+            const total = selectedDataset.values.reduce((a, b) => a + b, 0);
+
+            selectedDataset.labels.forEach((lbl, i) => {
+                const pct = total > 0 ? ((selectedDataset.values[i] / total) * 100).toFixed(1) : "0.0";
+                tbody.innerHTML += `
+                    <tr class="border-b border-gray-800/60 text-xs hover:bg-gray-900/20">
+                        <td class="px-3 py-3 text-gray-300 font-medium">${lbl}</td>
+                        <td class="px-3 py-3 text-right font-mono text-blue-400 font-bold">${selectedDataset.values[i]}</td>
+                        <td class="px-3 py-3 text-right font-mono text-gray-400">${pct}%</td>
+                    </tr>
+                `;
+            });
+
+            // 3. RE-RENDERIZAR DINÁMICAMENTE LA TABLA DE EDADES FILTRADA (Abajo)
+            const ageBody = document.getElementById('age-table-body');
+            ageBody.innerHTML = "";
+            
+            let colorDot = genderKey === 'female' ? 'text-pink-400' : genderKey === 'male' ? 'text-blue-400' : 'text-indigo-400';
+            let colorText = genderKey === 'female' ? 'text-pink-400' : genderKey === 'male' ? 'text-blue-400' : 'text-indigo-400';
+
+            Object.keys(selectedAgeDataset).forEach(range => {
+                ageBody.innerHTML += `
+                    <tr class="border-b border-gray-800/40 text-xs hover:bg-gray-900/10 transition-colors">
+                        <td class="px-4 py-2.5 font-medium text-gray-300"><i class="fa-solid fa-circle text-[6px] ${colorDot} mr-2"></i>${range}</td>
+                        <td class="px-4 py-2.5 text-center font-mono font-bold ${colorText}">${selectedAgeDataset[range]}</td>
+                        <td class="px-4 py-2.5 text-right text-[11px] text-gray-500 italic">Segmento de Muestra Sincronizado</td>
+                    </tr>
+                `;
+            });
+
+            // 4. Actualizar instancia gráfica de Chart.js
+            if (currentChartInstance) { currentChartInstance.destroy(); }
+
+            const ctx = document.getElementById('detail-chart-canvas').getContext('2d');
+            currentChartInstance = new Chart(ctx, {
+                type: genderKey === 'both' ? 'bar' : 'pie',
+                data: {
+                    labels: selectedDataset.labels,
+                    datasets: [{
+                        data: selectedDataset.values,
+                        backgroundColor: genderKey === 'female' ? ['#ec4899', '#f43f5e', '#d946ef', '#a855f7'] : 
+                                         genderKey === 'male' ? ['#3b82f6', '#0284c7', '#6366f1', '#06b6d4'] : 
+                                         ['#3b82f6', '#6366f1', '#8b5cf6', '#ec4899'],
+                        borderWidth: 1, borderColor: '#111827'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: genderKey !== 'both', labels: { color: '#9ca3af', font: { size: 9 } } } },
+                    scales: genderKey !== 'both' ? {} : {
+                        y: { ticks: { color: '#9ca3af', font: { size: 9 } }, grid: { color: '#1f2937' } },
+                        x: { ticks: { color: '#9ca3af', font: { size: 9 } }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
